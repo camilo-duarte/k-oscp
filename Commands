@@ -1,0 +1,8 @@
+###Buscar archivos de 64bytes 
+find / -type f -size 64c -exec du -sh {} \; 2>/dev/null 
+
+
+###Buscar archivo que no son de root y modificados 1 dia atras 
+find / -mtime -1 -print ! -user root -type f*
+
+
