@@ -6,3 +6,9 @@ find / -type f -size 64c -exec du -sh {} \; 2>/dev/null
 find / -mtime -1 -print ! -user root -type f*
 
 
+#########DNS############
+###Enumerar DNS Server###
+host -l 192.168.161.149#lo que se quiere buscar 192.168.161.149# (ip servidor)
+dig axfr mailman.com @192.168.161.149
+###Buscar dominios
+or ip in $(seq  1 255); do host 192.168.161.$ip; done | grep -v "not found"
