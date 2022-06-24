@@ -10,5 +10,7 @@ find / -mtime -1 -print ! -user root -type f*
 ###Enumerar DNS Server###
 host -l 192.168.161.149#lo que se quiere buscar 192.168.161.149# (ip servidor)
 dig axfr mailman.com @192.168.161.149
-###Buscar dominios
+###Buscar dominios fuerza burta por ip
 or ip in $(seq  1 255); do host 192.168.161.$ip; done | grep -v "not found"
+###Buscar dominios fuerza bruta por listado
+for ip in $(cat /usr/share/seclists/Discovery/DNS/subdomains-top1mil-5000.txt); do host $ip.mailman.com; done |grep -v "not found"
