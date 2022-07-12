@@ -56,4 +56,45 @@ john --wordlist=rockyou.txt key
 impacket-GetUserSPNs -dc-ip 192.168.183.57 'OFFSEC.LOCAL/usuario:password' -outputfile UserSPNs
 john --format=krb5tgs --wordlist=rockyou.txt UserSPNs 
 john --format=krb5tgs --show UserSPNs
+####Escalar privilegios
+- Windows
+Enumerando version OS
+systeminfo | findstr /B /C:"OS Name" /C:"OS Version" /C:"System Type"
+Enumerando procesos en ejecucion 
+tasklist /SVC
+ver conexiones activas
+netstat -ano
+enumerando reglas de FW
+netsh advfirewall show currentprofile
+netsh advfirewall firewall show rule name=all
+enumerando jobs 
+schtasks /query /fo LIST /v
+enumerando aplicaciones instaladas
+wmic product get name, version, vendor or wmic qfe get Caption, Description, HotFixID, InstalledOn
+
+
+Identificacion de carpetas sobrescribibles
+accesschk.exe -uws "Everyone" "C:\Program Files"
+Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
+
+Identificacion de binarios sobrescribibles
+reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
+
+
+Enumerando volumenes
+mountvol
+
+Enumeracion de Drivers y modulos
+powershell
+driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object ‘Display Name’, ‘Start Mode’, Path
+Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+
+
+- Linux
+Identificacion de carpetas sobrescribibles
+find / -writable -type d 2>/dev/null
+Identificacion de bincarios sobrescribibles
+find / -perm -u=s -type f 2>/dev/null
+https://gtfobins.github.io/
+
 ####
