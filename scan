@@ -1,0 +1,1 @@
+ldapsearch -H ldap://flight.htb -x -s base -b '' "(objectClass=*)" "*" +

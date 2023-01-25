@@ -1,3 +1,5 @@
+
+
 **averiguar offset**
 lanzar "A"\*200
 python \-c "print "A"\*100" \|nc ip puerto
