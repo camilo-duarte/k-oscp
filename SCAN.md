@@ -156,20 +156,4 @@ querygroupmem 0x200
 queryuser 0x1f4
 
 \*\*\*- SNMP
-nmap -sU -p161 --script *snmp* $target
-
-Aplogize for my english, im improving every day
-
-What is the Role?
-
-Please you can speak slower
-what are the benefits?
-medical plan
-Vacation
-Trainings
-Salary
-I have to go the office or can i work from home?
-
-currently, my main activities are : Pentest (apis or aplication customer), red team in the warehouse, social engeneer (phishing, vhishing. etc), i need to speak with diferents person in order to understan the new project or realease, every day teams create different things.
-
-i have 13 year expirience, in the area cybersecurity i have 8 or 9 expirience. i worked in PwC, I did assestmen vulnerabilities in aplications, in ATM's.
+nmap -sU -p161 --script *snmp
